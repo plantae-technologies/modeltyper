@@ -193,6 +193,11 @@ class GenerateCliOutput
                 $this->output = $entry . $this->output;
             });
 
+        // Add ESLint disable rules at the beginning of the file
+        $eslintRules = '/* eslint-disable @typescript-eslint/no-empty-object-type */' . PHP_EOL;
+        $eslintRules .= '/* eslint-disable no-unused-vars */' . PHP_EOL . PHP_EOL;
+        $this->output = "{$eslintRules}{$this->output}";
+
         if ($global) {
             $this->output .= '  }' . PHP_EOL . '}' . PHP_EOL . PHP_EOL;
         }

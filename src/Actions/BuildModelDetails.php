@@ -35,7 +35,7 @@ class BuildModelDetails
         $laravelModel = $reflectionModel->newInstance();
         $databaseColumns = $laravelModel->getConnection()->getSchemaBuilder()->getColumnListing($laravelModel->getTable());
 
-        $name = $this->getClassName($modelDetails['class']);
+        $name = $this->getTypescriptModelName($modelDetails['class'], $laravelModel->getTable());
         $columns = collect($modelDetails['attributes'])->filter(fn ($att) => in_array($att['name'], $databaseColumns));
         $nonColumns = collect($modelDetails['attributes'])->filter(fn ($att) => ! in_array($att['name'], $databaseColumns));
         $relations = collect($modelDetails['relations'])
@@ -114,5 +114,49 @@ class BuildModelDetails
 
             return $includeColumn;
         });
+    }
+
+    /**
+     * Get the TypeScript model name, adding prefix for models in specific namespaces.
+     */
+    private function getTypescriptModelName(string $className): string
+    {
+        $baseName = $this->getClassName($className);
+
+        // Add 'Vw' prefix for models in the App\Models\Views namespace
+        if (str_contains($className, 'App\\Models\\Views\\')) {
+            return "Vw$baseName";
+        }
+
+        // Instantiate the model to get the table name
+        if (class_exists($className)) {
+            $model = new $className;
+            $tableName = $model->getTable();
+            $prefix = $this->getTablePrefix($tableName);
+
+            // Add 'Utils' prefix for models in the PlantaeUtils namespace
+            if (str_contains($className, 'PlantaeUtils\\')) {
+                return "Utils{$prefix}{$baseName}";
+            }
+
+            return "{$prefix}{$baseName}";
+        }
+
+        return $baseName;
+    }
+
+    /**
+     * Extract the prefix from the table name and convert to PascalCase.
+     */
+    private function getTablePrefix(string $tableName): string
+    {
+        // Get the first part before underscore (e.g., 'org' from 'org_fazenda')
+        $parts = explode('_', $tableName);
+
+        if (count($parts) > 1) {
+            return ucfirst($parts[0]);
+        }
+
+        return '';
     }
 }

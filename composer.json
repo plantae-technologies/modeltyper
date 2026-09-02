@@ -16,9 +16,9 @@
     "require": {
         "php": "^8.2",
         "composer/class-map-generator": "^1.6",
-        "illuminate/console": "^11.33.0|^12.0",
-        "illuminate/database": "^11.33.0|^12.0",
-        "illuminate/support": "^11.33.0|^12.0"
+        "illuminate/console": "^11.33.0|^12.0|^13.0",
+        "illuminate/database": "^11.33.0|^12.0|^13.0",
+        "illuminate/support": "^11.33.0|^12.0|^13.0"
     },
     "require-dev": {
         "consolidation/robo": "^5.1.0",
